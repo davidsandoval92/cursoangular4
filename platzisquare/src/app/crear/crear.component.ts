@@ -1,6 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { LugaresService } from '../services/lugares.service';
 import { ActivatedRoute } from '@angular/router';
+import { Observable } from "rxjs";
+import 'rxjs/Rx';
+import { FormControl } from '@angular/forms';
+import { Http } from '@angular/http';
 
 @Component({
   selector: 'app-crear',
@@ -11,7 +15,9 @@ export class CrearComponent implements OnInit {
 
   lugar: any = {};
   id: any = null;
-  constructor(private lugaresService: LugaresService, private route: ActivatedRoute) {
+  private searchField:FormControl;
+  results$ : Observable<any>;
+  constructor(private lugaresService: LugaresService, private route: ActivatedRoute, private http:Http) {
     this.id = this.route.snapshot.params['id'];
     if (this.id != 'new') {
       this.lugaresService.getLugar(this.id).valueChanges()
@@ -19,6 +25,15 @@ export class CrearComponent implements OnInit {
           this.lugar = lugar;
         });
     }
+    
+    const URL = 'https://maps.google.com/maps/api/geocode/json';
+    this.searchField = new FormControl();
+    this.results$ = this.searchField.valueChanges
+    .debounceTime(500)
+    .switchMap(query => this.http.get(`${URL}?address=${query}`))
+    .map(response => response.json())
+    .map(response => response.results);
+    
   }
 
   guardarLugar() {
@@ -40,6 +55,12 @@ export class CrearComponent implements OnInit {
         this.lugar = {};
       });
 
+  }
+
+  seleccionarDireccion(direccion){
+    this.lugar.calle = direccion.address_components[1].long_name+' '+direccion.address_components[0].long_name;
+    this.lugar.ciudad = direccion.address_components[4].long_name;
+    this.lugar.pais = direccion.address_components[5].long_name;
   }
   ngOnInit() {
   }

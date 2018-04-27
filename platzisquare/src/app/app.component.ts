@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { AutorizacionService } from './services/autorizacion.service';
+import { Observable } from "rxjs";
+import 'rxjs/Rx';
 
 @Component({
   selector: 'app-root',
@@ -10,6 +12,7 @@ export class AppComponent {
 
   loggedIn = false;
   email = null;
+  loggedUser:any = {};
 people: any = [
   { name: 'David Sandoval', age:66 },
   { name: 'Daniela Guzman', age:16 },
@@ -22,6 +25,9 @@ people: any = [
     this.autorizacionService.isLogged().subscribe((result)=>{
       if(result && result.uid){
         this.loggedIn = true;
+        setTimeout(()=>{
+          this.loggedUser = this.autorizacionService.getEmail();
+        },500)
         this.email = autorizacionService.getEmail();
       }else{
         this.loggedIn = false;

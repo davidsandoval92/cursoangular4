@@ -23,10 +23,10 @@
     </ul>
     <ul class="nav navbar-nav navbar-right" *ngIf= "loggedIn">
         <li>
-          <a> Bienvenido {{email}} </a>
+          <a class="nav-link"> Bienvenido {{email}} </a>
         </li>
         <li>
-          <a (click)="logout()"> Logout</a>
+          <a class="nav-link" (click)="logout()"> Logout</a>
         </li>
       </ul>
   </div>
